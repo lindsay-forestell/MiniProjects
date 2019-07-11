@@ -14,7 +14,7 @@ from keras.utils import to_categorical, Sequence
 from keras.callbacks import ModelCheckpoint, TensorBoard, EarlyStopping
 from keras.utils import plot_model
 from keras.metrics import categorical_accuracy, top_k_categorical_accuracy
-from keras.layers import (Input, Dense, Activation, Dropout, LSTM, Concatenate)
+from keras.layers import (Input, Dense, Activation, Dropout, LSTM, Concatenate, LeakyReLU)
 from keras.models import Model
 from keras import backend as K
 
@@ -212,6 +212,10 @@ def make_model(prediction_type, lstm_layers, dense_layers, activation='relu'):
 
     if prediction_type == 'length':
         out = Activation('softmax')(out)
+    else:
+        # put a relu activation on the end of the cap_hit_pct
+        # the cap hit should never be negative
+        out = LeakyReLU(alpha=0.3)(out)
 
     # Create the actual model and return it
     model = Model(inputs=[input_1, input_2], outputs=out)
